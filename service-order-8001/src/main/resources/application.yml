@@ -1,0 +1,67 @@
+spring:
+  application:
+    name: service-order-8001
+  cloud:
+    sentinel:
+      eager: true  #提前加载
+      transport:
+        dashboard: localhost:8100 #sentinel控制台地址
+      web-context-unify: false
+    openfeign:
+      client:
+        config:
+          default: #默认配置
+            logger-level: full #全日志级别
+            connect-timeout: 500  #连接超时时间
+            read-timeout: 500     #读取超时时间
+          service-product-8003: #openFeign 的value  单独设置
+            logger-level: full #全日志级别
+            connect-timeout: 500  #连接超时时间
+            read-timeout: 500     #读取超时时间
+    nacos:
+      discovery:
+        namespace: dev
+        server-addr: localhost:8848
+        service: service-order-8001
+      config:
+        server-addr: localhost:8848
+        import-check:
+          enabled: false    #禁用配置中心导入检查
+        namespace: dev      #命名空间ID
+    alibaba:
+      seata:
+        tx-service-group: seata-server-group
+  config:
+    import: #配置中心导入的文件列表
+      - nacos:service-order.yml?group=order
+feign:
+  sentinel:
+    enabled: true
+
+server:
+  port: 8001
+
+logging:
+  level:
+    com.mmwwtt.serviceorder8001.feign: debug  #开启openFeign调用日志
+
+seata:
+  enabled: true
+  application-id: service-order-8001
+  tx-service-group: my_test_tx_group  # 与 Seata Server 配置一致
+  registry:
+    type: nacos
+    nacos:
+      application: service-seata
+      server-addr: 127.0.0.1:8848
+      namespace: dev
+      group: seata
+  config:
+    type: nacos
+    nacos:
+      server-addr: 127.0.0.1:8848
+  service:
+    vgroup-mapping:
+      seata-server-group: default
+    grouplist:
+      default: 127.0.0.1:8091
