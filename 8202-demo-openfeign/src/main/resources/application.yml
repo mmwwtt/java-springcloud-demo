@@ -1,0 +1,4 @@
+server:
+  port: 8202
+  servlet:
+    context-path: /openfeign

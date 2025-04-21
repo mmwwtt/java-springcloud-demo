@@ -1,0 +1,18 @@
+server:
+  port: 8200
+  servlet:
+    context-path: /nacos1
+spring:
+  application:
+    name: nacos1-services
+  cloud:
+    nacos:
+      discovery:
+        namespace: dev
+        server-addr: localhost:8848
+        service: nacos1-services
+      config:
+        server-addr: localhost:8848
+        import-check:
+          enabled: false    #禁用配置中心导入检查
+        namespace: dev      #命名空间ID

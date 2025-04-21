@@ -2,11 +2,8 @@ package com.mmwwtt.serviceorder8001.controller;
 
 import com.alibaba.csp.sentinel.annotation.SentinelResource;
 import com.alibaba.csp.sentinel.slots.block.BlockException;
-import com.mmwwtt.common.entity.Order;
 import com.mmwwtt.serviceorder8001.config.OrderYml;
-import com.mmwwtt.serviceorder8001.feign.ProductFeignClient;
 import com.mmwwtt.serviceorder8001.service.OrderService;
-import io.seata.spring.annotation.GlobalTransactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,10 +21,7 @@ public class OrderController {
 
     @Autowired
     private OrderService orderService;
-
-    @Autowired
-    private ProductFeignClient productFeignClient;
-
+    
     @Value("${order.timeout}")
     private String orderTimeout;
 
@@ -51,17 +45,18 @@ public class OrderController {
     @GetMapping("/nacos/config/demo")
     public String nacosConfig() {
         String config1 = "orderTimeout: " + orderTimeout + "     " + "orderAutoConfirm: " + orderAutoConfirm;
-        String config2 = "orderTimeout: " + orderYml.getTimeout() + "     " + "orderAutoConfirm: " + orderYml.getAutoConfirm();
+        String config2 =
+                "orderTimeout: " + orderYml.getTimeout() + "     " + "orderAutoConfirm: " + orderYml.getAutoConfirm();
         return config1 + "\n" + config2;
     }
 
-    @GetMapping("/demo/seata")
-    @GlobalTransactional(name = "order-service", rollbackFor = Exception.class)
-    public void demoSeata() {
-        log.info("seata - order 正常执行");
-        //使用openFeign调用接口
-        productFeignClient.demoSeata();
-    }
+//    @GetMapping("/demo/seata")
+//    @GlobalTransactional(name = "order-service", rollbackFor = Exception.class)
+//    public void demoSeata() {
+//        log.info("seata - order 正常执行");
+//        //使用openFeign调用接口
+//        productFeignClient.demoSeata();
+//    }
 
     //    @GetMapping("/create")
 //    public Order createOrder(List<Product> productList, String userId) {
@@ -78,12 +73,12 @@ public class OrderController {
      */
     @GetMapping("/create")
     @SentinelResource(value = "createOrder", blockHandler = "createOrderFallback")
-    public Order createOrder(@RequestParam("productId") String productId, @RequestParam("userId") String userId) {
-        return orderService.createOrder(productId, userId);
+    public void createOrder(@RequestParam("productId") String productId, @RequestParam("userId") String userId) {
+        orderService.createOrder(productId, userId);
     }
 
     //sentinel执行兜底回调
-    public Order createOrderFallback(String productId, String userId, BlockException e) {
-        return new Order();
+    public void createOrderFallback(String productId, String userId, BlockException e) {
+        return;
     }
 }

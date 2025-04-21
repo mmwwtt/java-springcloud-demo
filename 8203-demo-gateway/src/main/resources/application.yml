@@ -1,0 +1,13 @@
+server:
+  port: 8203
+spring:
+  application:
+    name: gateway-services
+  profiles:
+    include: route    #其他yml引入
+  cloud:
+    nacos:
+      discovery:
+        namespace: dev
+        server-addr: localhost:8848
+        service: gateway-services
